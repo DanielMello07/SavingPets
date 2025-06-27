@@ -34,6 +34,7 @@ typedef struct Tutor {
 
 typedef struct Animal {
     int ocupado;
+    int adotado;
     char nome_animal[256];
     int id_animal;
     int id_tutor;
@@ -98,13 +99,14 @@ void cadastro_inserir_tutor(Tutor tutor);
 Tutor cadastro_pesquisar_tutor(int id);
 int cadastro_remover_animal(int id);
 int cadastro_remover_tutor(int id);
-int novo_tutor_cadatro_animal();
-int novo_animal_cadatro_tutor();
 int qtde_animais_cadastrados_tutor(int id_tutor);
 Tutor animais_id_tutor_inicializador();
 int gerar_id_proximo(const char *nome_arquivo, int indice_id);
 int controladores_inteiros(char* mensagem);
 int controladores_id(char* mensagem);
+int inserir_id_animal_em_tutor(int id_animal, int id_tutor);
+int tela_limite_animais(int id_tutor);
+int tela_exclusao_tutor_opcoes();
 
 // Telas
 void marcas(int tela);
@@ -490,9 +492,9 @@ void tela_cadastrar_animal() {
         fflush(stdin);
 
         a.ocupado = 1;
+        a.adotado = 0;
         cadastro_inserir_animal(a);
-        printf("Animal cadastrado com sucesso!\n");
-        system("pause");
+        inserir_id_animal_em_tutor(a.id_animal, a.id_tutor);
 
         continuar = tela_mensagem("Deseja cadastrar outro animal?");
     } while (continuar == 1);
@@ -501,7 +503,7 @@ void tela_cadastrar_animal() {
 Endereco tela_cadastar_endereco() {
     Endereco endereco;
 
-    printf("Digite o CEP: ");
+    printf("\t\t\t\tDigite o CEP: ");
     for(int j = 0; j < 8; j++) {
         scanf("%1d", &endereco.cep[j]);
     }
@@ -683,7 +685,8 @@ void tela_relatorio_animais() {
             printf("Vacinas: %s\n", vetor_animais[i].vacinas);
             printf("Vermifugado: %c\n", vetor_animais[i].vermifugado);
             printf("Histórico: %s\n", vetor_animais[i].historico);
-            printf("Castrado: %c\n\n", vetor_animais[i].castrado);
+            printf("Castrado: %c\n", vetor_animais[i].castrado);
+            printf("Adotado: %d\n\n", vetor_animais[i].adotado);
         }
     }
     system("pause");
@@ -759,6 +762,7 @@ void tela_pesquisar() {
             printf("Vermifugado: %c\n", a.vermifugado);
             printf("Histórico: %s\n", a.historico);
             printf("Castrado: %c\n", a.castrado);
+            printf("Adotado: %d\n", a.adotado);
         } else {
             printf("\nAnimal não encontrado.\n");
         }
@@ -850,7 +854,7 @@ void tela_remover_tutor() {
         if (cadastro_remover_tutor(id)) {
             printf("Tutor removido com sucesso.\n");
         } else {
-            printf("Tutor não encontrado.\n");
+            printf("Tutor não encontrado ou operação cancelada.\n");
         }
 
         system("pause");
@@ -1026,6 +1030,41 @@ void tela_cadastrar_ocorrencia() {
 
     ocorrencia.id_processo = controladores_id("Digite o ID do Processo Adotivo: ");
     ocorrencia.id_tutor = controladores_id("Digite o ID do Tutor: ");
+
+    // Validação do tutor
+    if (!verificar_id_tutor_existente(ocorrencia.id_tutor)) {
+        printf("ERRO! Não foi encontrado o tutor com este ID.\n");
+        system("pause");
+        fclose(file);
+        return;
+    }
+
+    // Validação do animal via processo
+    int animal_valido = 0;
+    FILE *fp = fopen("processos.txt", "r");
+    if (fp) {
+        char linha[1024];
+        while (fgets(linha, sizeof(linha), fp) != NULL) {
+            int id_processo, id_animal, id_tutor, ativo;
+            char data[15], relatorio[300], agendamento[200], dados[200];
+            if (sscanf(linha, "%d;%d;%d;%14[^;];%299[^;];%199[^;];%199[^;];%d",
+                &id_processo, &id_animal, &id_tutor, data, relatorio, agendamento, dados, &ativo) == 8) {
+                if (id_processo == ocorrencia.id_processo) {
+                    animal_valido = verificar_id_animal_existente(id_animal);
+                    break;
+                }
+            }
+        }
+        fclose(fp);
+    }
+
+    if (!animal_valido) {
+        printf("ERRO! Não foi encontrado o animal associado a este processo.\n");
+        system("pause");
+        fclose(file);
+        return;
+    }
+
     getchar();
 
     printf("Descreva o ocorrido: ");
@@ -1128,6 +1167,7 @@ void cadastro_inicializar_animais() {
     total_animais = 0;
     for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
         vetor_animais[i].ocupado = 0;
+        vetor_animais[i].adotado = 0;
     }
 }
 
@@ -1208,7 +1248,7 @@ void cadastro_carregar_dados_arquivo_tutores() {
 
         fscanf(fp, "%d\n", &tutor.id_tutor);
 
-        for(int j = 0; tutor.id_animais[j != 0]; j++){
+        for(int j = 0; j < 10; j++){
             fscanf(fp, "%d", &tutor.id_animais[j]);
         }
         fscanf(fp, "\n");
@@ -1264,6 +1304,7 @@ void cadastro_carregar_dados_arquivo_animais() {
         Animal a;
 
         fscanf(fp, "%d %d ", &a.id_animal, &a.id_tutor);
+        a.adotado = (a.id_tutor != 0) ? 1 : 0;
 
         fgets(a.nome_animal, 256, fp);
         a.nome_animal[strcspn(a.nome_animal, "\n")] = 0;
@@ -1461,12 +1502,116 @@ Animal cadastro_pesquisar_animal(int id) {
     return vazio;
 }
 
+int tela_limite_animais(int id_tutor) {
+    system("cls");
+    printf("\t\t\t\tERRO! O tutor em questão atingiu o limite de animais alocados.\n\n");
+    printf("\t\t\t\tSelecione como proceder:\n");
+    printf("\t\t\t\t1 - Deletar um animal do tutor vigente.\n");
+    printf("\t\t\t\t2 - Interromper cadastro.\n");
+    printf("\t\t\t\tOpcao: ");
+
+    int opcao;
+    scanf("%d", &opcao);
+    fflush(stdin);
+
+    if (opcao == 1) {
+        Tutor tutor = cadastro_pesquisar_tutor(id_tutor);
+        if (tutor.tutor_ocupado == 0) {
+            printf("\t\t\t\tTutor não encontrado.\n");
+            system("pause");
+            return 0;
+        }
+
+        printf("\t\t\t\tIDs dos animais:\n");
+        for (int i = 0; i < 10; i++) {
+            if (tutor.id_animais[i] != 0) {
+                printf("\t\t\t\t%d\n", tutor.id_animais[i]);
+            }
+        }
+
+        int id_animal_remover;
+        printf("\t\t\t\tDigite o ID do animal a ser removido: ");
+        scanf("%d", &id_animal_remover);
+        fflush(stdin);
+
+        // Remove o animal do tutor
+        for (int i = 0; i < NUM_MAX_TUTORES; i++) {
+            if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor == id_tutor) {
+                for (int j = 0; j < 10; j++) {
+                    if (vetor_tutores[i].id_animais[j] == id_animal_remover) {
+                        vetor_tutores[i].id_animais[j] = 0;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        // Atualiza o status do animal
+        for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
+            if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == id_animal_remover) {
+                vetor_animais[i].adotado = 0;
+                vetor_animais[i].id_tutor = 0;
+                break;
+            }
+        }
+
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int tela_exclusao_tutor_opcoes() {
+    system("cls");
+    printf("\t\t\t\tOpções de exclusão de tutor\n\n");
+    printf("\t\t\t\t1- Excluir o tutor e manter os animais (Recomendado somente no caso de recadastro ou realocação do animal).\n");
+    printf("\t\t\t\t2- Excluir todos os animais associados ao tutor.\n");
+    printf("\t\t\t\tOpcao: ");
+
+    int opcao;
+    scanf("%d", &opcao);
+    fflush(stdin);
+
+    return opcao;
+}
+
 int cadastro_remover_tutor(int id) {
     for (int i = 0; i < NUM_MAX_TUTORES; i++) {
         if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor == id) {
-            vetor_tutores[i].tutor_ocupado = 0;
-            total_tutores--;
-            return 1;
+            int opcao = tela_exclusao_tutor_opcoes();
+
+            if (opcao == 1) {
+                // Mantém os animais, apenas remove o tutor e desassocia os animais
+                for (int j = 0; j < 10; j++) {
+                    int id_animal = vetor_tutores[i].id_animais[j];
+                    if (id_animal != 0) {
+                        for (int k = 0; k < NUM_MAX_ANIMAIS; k++) {
+                            if (vetor_animais[k].ocupado == 1 && vetor_animais[k].id_animal == id_animal) {
+                                vetor_animais[k].adotado = 0;
+                                vetor_animais[k].id_tutor = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+                vetor_tutores[i].tutor_ocupado = 0;
+                total_tutores--;
+                return 1;
+            } else if (opcao == 2) {
+                // Remove o tutor e todos os animais associados
+                for (int j = 0; j < 10; j++) {
+                    int id_animal = vetor_tutores[i].id_animais[j];
+                    if (id_animal != 0) {
+                        cadastro_remover_animal(id_animal);
+                    }
+                }
+                vetor_tutores[i].tutor_ocupado = 0;
+                total_tutores--;
+                return 1;
+            } else {
+                return 0; // Operação cancelada
+            }
         }
     }
     return 0;
@@ -1502,4 +1647,40 @@ int gerar_id_proximo(const char *nome_arquivo, int indice_id) {
 
     fclose(file);
     return maior_id + 1;
+}
+
+int inserir_id_animal_em_tutor(int id_animal, int id_tutor) {
+    for (int i = 0; i < NUM_MAX_TUTORES; i++) {
+        if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor == id_tutor) {
+            int count = 0;
+            for (int j = 0; j < 10; j++) {
+                if (vetor_tutores[i].id_animais[j] != 0) {
+                    count++;
+                }
+            }
+
+            if (count >= 10) {
+                if (tela_limite_animais(id_tutor) == 1) {
+                    return inserir_id_animal_em_tutor(id_animal, id_tutor);
+                } else {
+                    return 0;
+                }
+            }
+
+            for (int j = 0; j < 10; j++) {
+                if (vetor_tutores[i].id_animais[j] == 0) {
+                    vetor_tutores[i].id_animais[j] = id_animal;
+                    for (int k = 0; k < NUM_MAX_ANIMAIS; k++) {
+                        if (vetor_animais[k].ocupado == 1 && vetor_animais[k].id_animal == id_animal) {
+                            vetor_animais[k].adotado = 1;
+                            vetor_animais[k].id_tutor = id_tutor;
+                            break;
+                        }
+                    }
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
 }
