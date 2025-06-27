@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1750973867 source:c:\pe_savingpets\savingpets\savingpets\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+	<ctype.h>
+
