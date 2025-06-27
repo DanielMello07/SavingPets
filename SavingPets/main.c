@@ -107,6 +107,8 @@ int controladores_id(char* mensagem);
 int inserir_id_animal_em_tutor(int id_animal, int id_tutor);
 int tela_limite_animais(int id_tutor);
 int tela_exclusao_tutor_opcoes();
+int gerar_proximo_id_animal();
+int gerar_proximo_id_tutor();
 
 // Telas
 void marcas(int tela);
@@ -432,7 +434,9 @@ void tela_cadastrar_animal() {
             return;
         }
 
-        a.id_animal = controladores_id("Digite o ID do animal: ");
+        // Gera ID automático
+        a.id_animal = gerar_proximo_id_animal();
+        printf("ID do animal gerado automaticamente: %d\n", a.id_animal);
 
         if (verificar_id_animal_existente(a.id_animal)) {
             printf("Erro: ID de animal já cadastrado!\n");
@@ -566,7 +570,9 @@ void tela_cadastrar_tutor() {
             break;
         }
 
-        t.id_tutor = controladores_id("Digite o ID do tutor: ");
+        // Gera ID automático
+        t.id_tutor = gerar_proximo_id_tutor();
+        printf("ID do tutor gerado automaticamente: %d\n", t.id_tutor);
 
         if (verificar_id_tutor_existente(t.id_tutor)) {
             printf("Erro: ID de tutor já cadastrado!\n");
@@ -906,18 +912,10 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_animal_existente(processo.id_animal)) {
             animal_valido = 1;
         } else {
-            printf("Animal não encontrado.\n");
-            printf("1 - Cadastrar novo animal\n");
-            printf("2 - Cancelar\n");
-            opcao = controladores_inteiros("Escolha: ");
-            if(opcao == 1) {
-                system("cls");
-                tela_cadastrar_animal();
-                animal_valido = verificar_id_animal_existente(processo.id_animal);
-            } else {
-                fclose(file);
-                return;
-            }
+            printf("Animal não encontrado! Cadastre o animal primeiro.\n");
+            system("pause");
+            fclose(file);
+            return;
         }
     }
 
@@ -929,18 +927,10 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_tutor_existente(processo.id_tutor)) {
             tutor_valido = 1;
         } else {
-            printf("Tutor não encontrado.\n");
-            printf("1 - Cadastrar novo tutor\n");
-            printf("2 - Cancelar\n");
-            opcao = controladores_inteiros("Escolha: ");
-            if(opcao == 1) {
-                system("cls");
-                tela_cadastrar_tutor();
-                tutor_valido = verificar_id_tutor_existente(processo.id_tutor);
-            } else {
-                fclose(file);
-                return;
-            }
+            printf("Tutor não encontrado! Cadastre o tutor primeiro.\n");
+            system("pause");
+            fclose(file);
+            return;
         }
     }
 
@@ -1033,24 +1023,26 @@ void tela_cadastrar_ocorrencia() {
 
     // Validação do tutor
     if (!verificar_id_tutor_existente(ocorrencia.id_tutor)) {
-        printf("ERRO! Não foi encontrado o tutor com este ID.\n");
+        printf("ERRO! Não foi encontrado o tutor com este ID. Cadastre o tutor primeiro.\n");
         system("pause");
         fclose(file);
         return;
     }
 
     // Validação do animal via processo
-    int animal_valido = 0;
+    int processo_valido = 0;
+    int id_animal = -1;
     FILE *fp = fopen("processos.txt", "r");
     if (fp) {
         char linha[1024];
         while (fgets(linha, sizeof(linha), fp) != NULL) {
-            int id_processo, id_animal, id_tutor, ativo;
+            int id_processo, id_animal_temp, id_tutor, ativo;
             char data[15], relatorio[300], agendamento[200], dados[200];
             if (sscanf(linha, "%d;%d;%d;%14[^;];%299[^;];%199[^;];%199[^;];%d",
-                &id_processo, &id_animal, &id_tutor, data, relatorio, agendamento, dados, &ativo) == 8) {
+                &id_processo, &id_animal_temp, &id_tutor, data, relatorio, agendamento, dados, &ativo) == 8) {
                 if (id_processo == ocorrencia.id_processo) {
-                    animal_valido = verificar_id_animal_existente(id_animal);
+                    processo_valido = 1;
+                    id_animal = id_animal_temp;
                     break;
                 }
             }
@@ -1058,8 +1050,15 @@ void tela_cadastrar_ocorrencia() {
         fclose(fp);
     }
 
-    if (!animal_valido) {
-        printf("ERRO! Não foi encontrado o animal associado a este processo.\n");
+    if (!processo_valido) {
+        printf("ERRO! Processo adotivo não encontrado.\n");
+        system("pause");
+        fclose(file);
+        return;
+    }
+
+    if (!verificar_id_animal_existente(id_animal)) {
+        printf("ERRO! Animal associado ao processo não encontrado. Cadastre o animal primeiro.\n");
         system("pause");
         fclose(file);
         return;
@@ -1153,6 +1152,26 @@ int controladores_id(char* mensagem) {
         }
     } while (id <= 0);
     return id;
+}
+
+int gerar_proximo_id_animal() {
+    int max_id = 0;
+    for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
+        if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal > max_id) {
+            max_id = vetor_animais[i].id_animal;
+        }
+    }
+    return max_id + 1;
+}
+
+int gerar_proximo_id_tutor() {
+    int max_id = 0;
+    for (int i = 0; i < NUM_MAX_TUTORES; i++) {
+        if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor > max_id) {
+            max_id = vetor_tutores[i].id_tutor;
+        }
+    }
+    return max_id + 1;
 }
 
 int cadastro_verificar_capacidade_maxima_animais() {
@@ -1618,6 +1637,19 @@ int cadastro_remover_tutor(int id) {
 }
 
 int cadastro_remover_animal(int id) {
+    // Encontra o tutor associado e remove o ID do animal
+    for (int i = 0; i < NUM_MAX_TUTORES; i++) {
+        if (vetor_tutores[i].tutor_ocupado == 1) {
+            for (int j = 0; j < 10; j++) {
+                if (vetor_tutores[i].id_animais[j] == id) {
+                    vetor_tutores[i].id_animais[j] = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Remove o animal
     for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
         if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == id) {
             vetor_animais[i].ocupado = 0;
