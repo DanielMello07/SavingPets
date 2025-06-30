@@ -202,7 +202,7 @@ int main() {
 
 void marcas(int tela) {
     if(tela == 0){
-        printf("\t\t\t\t                                                                          \n");
+        printf("\Bem vindo ao:                                                                          \n");
         printf("\t\t\t\t                                                                          \n");
         printf("\t\t\t\t                         @@@@@@@@@             @@@@@@@@@@                  \n");
         printf("\t\t\t\t                       @@@@@@@@@@@@@         @@@@@@@@@@@@@                 \n");
@@ -234,7 +234,12 @@ void marcas(int tela) {
         printf("\t\t\t\t                       @@@@@@@@@@@@               @@@@@@@@@@@@             \n");
         printf("\t\t\t\t                                                                           \n\n\n");
 
-        printf("\t\t\t\t\tSavingPets - Sistema Gerenciador de Pós adoção de Animais Resgatados\n\n\n");
+        printf("\t\t\t\t    _______ _______ _    _ _____ __   _  ______  _____  _______ _______ _______\n");
+        printf("\t\t\t\t    |______ |_____|  \\  /    |   | \\  | |  ____ |_____] |______    |    |______\n");
+        printf("\t\t\t\t    ______| |     |   \\/   __|__ |  \\_| |_____| |       |______    |    ______|\n");
+        printf("                                                                           \n");
+
+        printf("\t\t\t\t\t       Sistema Gerenciador de Pós adoção de Animais Resgatados\n\n\n");
         system("pause");
     } else if(tela == 1) {
         printf("\t\t\t\t\t\t\t                   /\\_/\\   \n");
