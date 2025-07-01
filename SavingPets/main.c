@@ -528,6 +528,8 @@ void tela_cadastrar_animal() {
         cadastro_inserir_animal(a);
         inserir_id_animal_em_tutor(a.id_animal, a.id_tutor);
 
+        printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n\n");
+
         continuar = tela_mensagem("\n\n\t\t\t\tDeseja cadastrar outro animal?");
     } while (continuar == 1);
 }
