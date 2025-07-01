@@ -109,6 +109,7 @@ int tela_limite_animais(int id_tutor);
 int tela_exclusao_tutor_opcoes();
 int gerar_proximo_id_animal();
 int gerar_proximo_id_tutor();
+int animal_pertence_ao_tutor(int id_animal, int id_tutor); // Nova função de validação
 
 // Telas
 void marcas(int tela);
@@ -202,12 +203,11 @@ int main() {
 
 void marcas(int tela) {
     if(tela == 0){
-        printf("\Bem vindo ao:                                                                          \n");
+        printf("Bem vindo ao:                                                                          \n");
         printf("\t\t\t\t                                                                          \n");
         printf("\t\t\t\t                         @@@@@@@@@             @@@@@@@@@@                  \n");
         printf("\t\t\t\t                       @@@@@@@@@@@@@         @@@@@@@@@@@@@                 \n");
         printf("\t\t\t\t                      @@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@                \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@              \n");
         printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@              \n");
         printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@              \n");
         printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@                \n");
@@ -239,7 +239,7 @@ void marcas(int tela) {
         printf("\t\t\t\t    ______| |     |   \\/   __|__ |  \\_| |_____| |       |______    |    ______|\n");
         printf("                                                                           \n");
 
-        printf("\t\t\t\t\t       Sistema Gerenciador de Pós adoção de Animais Resgatados\n\n\n");
+        printf("\t\t\t\t\t       Sistema Gerenciador de Pós adoção de Animais Resgatados\n\n");
         system("pause");
     } else if(tela == 1) {
         printf("\t\t\t\t\t\t\t                   /\\_/\\   \n");
@@ -325,7 +325,7 @@ void tela_processos_adotivos() {
                 sair = 1;
                 break;
             default:
-                printf("\n\t\t\t\tOpção Inválida !!! \n");
+                printf("\n\t\t\t\t\t\t           Opção Inválida! \n\n");
                 system("pause");
         }
     } while(sair == 0);
@@ -423,8 +423,9 @@ int tela_novo_animal_cadatro_tutor(int id_animal, int id_tutor) {
     a.adotado = 1; // Animal já é adotado pelo tutor
     cadastro_inserir_animal(a);
 
-    printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n");
+    printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n\n");
     system("pause");
+    system("cls");
     return 1;
 }
 
@@ -445,7 +446,7 @@ void tela_cadastrar_animal() {
 
         // Gera ID automático
         a.id_animal = gerar_proximo_id_animal();
-        printf("\n\t\t\t\tID do animal gerado automaticamente: %d\n\n", a.id_animal);
+        printf("\n\t\t\t\tID do animal: %d\n\n", a.id_animal);
 
         if (verificar_id_animal_existente(a.id_animal)) {
             printf("\n\t\t\t\tErro: ID de animal já cadastrado!\n");
@@ -468,6 +469,24 @@ void tela_cadastrar_animal() {
                     continue;
                 }
             } else {
+                continue;
+            }
+        }
+
+        // VERIFICA SE TUTOR TEM ESPAÇO PARA MAIS ANIMAIS
+        Tutor tutor = cadastro_pesquisar_tutor(a.id_tutor);
+        int count = 0;
+        for (int j = 0; j < 10; j++) {
+            if (tutor.id_animais[j] != 0) {
+                count++;
+            }
+        }
+
+        if (count >= 10) {
+            int result = tela_limite_animais(a.id_tutor);
+            if (result == 0) {
+                printf("\n\t\t\t\tOperação cancelada. O tutor não tem espaço.\n");
+                system("pause");
                 continue;
             }
         }
@@ -585,7 +604,7 @@ void tela_cadastrar_tutor() {
         // Gera ID automático
         t.id_tutor = gerar_proximo_id_tutor();
 
-        printf("\t\t\t\tID do tutor gerado automaticamente: %d\n\n", t.id_tutor);
+        printf("\t\t\t\tID do tutor: %d\n\n", t.id_tutor);
 
         quantidade_adotados = controladores_inteiros("\t\t\t\tDigite a quantidade de animais adotados: ");
 
@@ -602,13 +621,13 @@ void tela_cadastrar_tutor() {
             int id_valido = 0;
 
             while (!id_valido) {
-                int id_animal = controladores_id("\t\t\t\tDigite o ID do animal: ");
+                int id_animal = controladores_id("\n\t\t\t\tDigite o ID do animal: ");
 
                 if (verificar_id_animal_existente(id_animal)) {
                     Animal animal = cadastro_pesquisar_animal(id_animal);
                     if (animal.adotado == 1) {
                         printf("\n\t\t\t\tErro: O animal de ID %d já está adotado por outro tutor.\n", id_animal);
-                        printf("\n\n\t\t\t\tPor favor, escolha outro animal.\n");
+                        printf("\t\t\t\tPor favor, escolha outro animal.\n\n");
 
                         system("pause");
                         system("cls");
@@ -655,7 +674,21 @@ void tela_cadastrar_tutor() {
 
         t.tutor_ocupado = 1;
         cadastro_inserir_tutor(t);
-        printf("\n\t\t\t\tTutor cadastrado com sucesso!\n");
+
+        // ATUALIZA OS ANIMAIS PARA ADOTADOS
+        for (int i = 0; i < quantidade_adotados; i++) {
+            if (t.id_animais[i] != 0) {
+                for (int j = 0; j < NUM_MAX_ANIMAIS; j++) {
+                    if (vetor_animais[j].ocupado == 1 && vetor_animais[j].id_animal == t.id_animais[i]) {
+                        vetor_animais[j].adotado = 1;
+                        vetor_animais[j].id_tutor = t.id_tutor;
+                        break;
+                    }
+                }
+            }
+        }
+
+        printf("\n\t\t\t\tTutor cadastrado com sucesso!\n\n");
 
         system("pause");
         system("cls");
@@ -691,7 +724,7 @@ void tela_relatorio() {
             case 3:
                 return;
             default:
-                printf("\n\t\t\t\tOpção Inválida !!! \n");
+                printf("\n\t\t\t\t\tOpção Inválida !!! \n");
 
                 system("pause");
                 system("cls");
@@ -718,7 +751,6 @@ void tela_relatorio_animais() {
             printf("\t| Vermifugado: %c\n", vetor_animais[i].vermifugado);
             printf("\t| Histórico: %s\n", vetor_animais[i].historico);
             printf("\t| Castrado: %c\n", vetor_animais[i].castrado);
-            printf("\t| Adotado: %d\n", vetor_animais[i].adotado);
             printf("\t+-------------------------------------------------+\n\n");
         }
     }
@@ -797,7 +829,6 @@ void tela_pesquisar() {
             printf("\t| Vermifugado: %c\n", a.vermifugado);
             printf("\t| Histórico: %s\n", a.historico);
             printf("\t| Castrado: %c\n", a.castrado);
-            printf("\t| Adotado: %d\n", a.adotado);
             printf("\t+-------------------------------------------------+\n\n");
         } else {
             printf("\t\t\t\tAnimal não encontrado.\n\n");
@@ -855,7 +886,7 @@ void tela_pesquisar_tutor() {
             printf("\t| Email: %s\n", t.contato.email);
             printf("\t+-------------------------------------------------+\n\n");
         } else {
-            printf("\n\tTutor não encontrado.\n");
+            printf("\n\tTutor não encontrado.\n\n");
         }
         system("pause");
         continuar = tela_mensagem("\n\tDeseja pesquisar outro tutor?");
@@ -871,7 +902,7 @@ void tela_remover() {
         id = controladores_id("\t\t\t\tDigite o ID do animal a ser removido: ");
 
         if (cadastro_remover_animal(id)) {
-            printf("\t\t\t\tAnimal removido com sucesso.\n");
+            printf("\t\t\t\tAnimal removido com sucesso.\n\n");
         } else {
             printf("\n\t\t\t\tAnimal não encontrado.\n\n");
         }
@@ -889,7 +920,7 @@ void tela_remover_tutor() {
         id = controladores_id("\t\t\t\tDigite o ID do tutor a ser removido: ");
 
         if (cadastro_remover_tutor(id)) {
-            printf("\n\t\t\t\tTutor removido com sucesso.\n");
+            printf("\n\t\t\t\tTutor removido com sucesso.\n\n");
         } else {
             printf("\n\t\t\t\tTutor não encontrado ou operação cancelada.\n\n");
         }
@@ -945,7 +976,7 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_animal_existente(processo.id_animal)) {
             animal_valido = 1;
         } else {
-            printf("\t\t\t\tAnimal não encontrado! Cadastre o animal primeiro.\n");
+            printf("\n\t\t\t\tAnimal não encontrado! Cadastre o animal primeiro.\n\n");
             system("pause");
             fclose(file);
             return;
@@ -960,11 +991,19 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_tutor_existente(processo.id_tutor)) {
             tutor_valido = 1;
         } else {
-            printf("\n\t\t\t\tTutor não encontrado! Cadastre o tutor primeiro.\n");
+            printf("\n\t\t\t\tTutor não encontrado! Cadastre o tutor primeiro.\n\n");
             system("pause");
             fclose(file);
             return;
         }
+    }
+
+    // VALIDAÇÃO CRÍTICA: Verificar se o animal pertence ao tutor
+    if (!animal_pertence_ao_tutor(processo.id_animal, processo.id_tutor)) {
+        printf("\n\t\t\t\tErro: Este animal não pertence ao tutor informado!\n\n");
+        system("pause");
+        fclose(file);
+        return;
     }
 
     printf("\t\t\t\tData da adoção (dd mm aaaa): ");
@@ -1026,7 +1065,7 @@ void tela_consultar_processos_adotivos() {
             printf("\t\t\t\tAgendamentos: %s\n", processo.agendamentos);
             printf("\t\t\t\tDados médicos: %s\n", processo.dados_medicos);
             printf("\t\t\t\tStatus: %s\n", (processo.ativo == 1 ? "Ativo" : "Inativo"));
-            printf("\t\t\t\t----------------------------------------\n");
+            printf("\t\t\t\t----------------------------------------\n\n");
         } else {
             printf("\n\t\t\t\t[Erro] Linha mal formatada: %s", linha);
         }
@@ -1047,9 +1086,7 @@ void tela_cadastrar_ocorrencia() {
 
     system("cls");
 
-
     printf("\t\t\t\t\t\t\t       --- Cadastro de Ocorrencia ---\n\n\n");
-
     marcas(1);
 
     ocorrencia.id_ocorrencia = gerar_id_proximo("ocorrencias.txt", 0);
@@ -1060,7 +1097,7 @@ void tela_cadastrar_ocorrencia() {
 
     // Validação do tutor
     if (!verificar_id_tutor_existente(ocorrencia.id_tutor)) {
-        printf("\n\t\t\t\tERRO! Não foi encontrado o tutor com este ID. Cadastre o tutor primeiro.\n");
+        printf("\n\t\t\t\tERRO! Não foi encontrado o tutor com este ID. Cadastre o tutor primeiro.\n\n");
         system("pause");
         fclose(file);
         return;
@@ -1068,18 +1105,21 @@ void tela_cadastrar_ocorrencia() {
 
     // Validação do animal via processo
     int processo_valido = 0;
+    int id_tutor_processo = -1;  // Para armazenar o tutor correto do processo
     int id_animal = -1;
+
     FILE *fp = fopen("processos.txt", "r");
     if (fp) {
         char linha[1024];
         while (fgets(linha, sizeof(linha), fp) != NULL) {
-            int id_processo, id_animal_temp, id_tutor, ativo;
+            int id_processo, id_animal_temp, id_tutor_temp, ativo;
             char data[15], relatorio[300], agendamento[200], dados[200];
             if (sscanf(linha, "%d;%d;%d;%14[^;];%299[^;];%199[^;];%199[^;];%d",
-                &id_processo, &id_animal_temp, &id_tutor, data, relatorio, agendamento, dados, &ativo) == 8) {
+                &id_processo, &id_animal_temp, &id_tutor_temp, data, relatorio, agendamento, dados, &ativo) == 8) {
                 if (id_processo == ocorrencia.id_processo) {
                     processo_valido = 1;
                     id_animal = id_animal_temp;
+                    id_tutor_processo = id_tutor_temp;  // Guarda o tutor do processo
                     break;
                 }
             }
@@ -1088,22 +1128,37 @@ void tela_cadastrar_ocorrencia() {
     }
 
     if (!processo_valido) {
-        printf("\n\t\t\t\tERRO! Processo adotivo não encontrado.\n");
+        printf("\n\t\t\t\tERRO! Processo adotivo não encontrado.\n\n");
         system("pause");
         fclose(file);
         return;
     }
 
+    // VALIDAÇÃO CRÍTICA: Verificar se o tutor da ocorrência é o mesmo do processo
+    if (ocorrencia.id_tutor != id_tutor_processo) {
+        printf("\n\t\t\t\tERRO! O tutor informado não é o tutor deste processo adotivo.\n\n");
+        system("pause");
+        fclose(file);
+        return;
+    }
+
+    // Validação do animal
     if (!verificar_id_animal_existente(id_animal)) {
-        printf("\n\t\t\t\tERRO! Animal associado ao processo não encontrado. Cadastre o animal primeiro.\n");
+        printf("\n\t\t\t\tERRO! Animal associado ao processo não encontrado. Cadastre o animal primeiro.\n\n");
         system("pause");
         fclose(file);
         return;
     }
 
-    getchar();
+    // VALIDAÇÃO FINAL: Verificar se o animal pertence ao tutor
+    if (!animal_pertence_ao_tutor(id_animal, ocorrencia.id_tutor)) {
+        printf("\n\t\t\t\tERRO! Inconsistência: animal não pertence ao tutor!\n\n");
+        system("pause");
+        fclose(file);
+        return;
+    }
 
-    printf("\n\t\t\t\tDescreva o ocorrido: ");
+    printf("\t\t\t\tDescreva o ocorrido: ");
     scanf(" %299[^\n]", ocorrencia.descricao);
     fflush(stdin);
 
@@ -1141,9 +1196,7 @@ void tela_consultar_ocorrencias() {
     char linha[1024];
 
     system("cls");
-
     printf("\t\t\t\t     +-------------------------- 4 - Consultar Ocorrência ---------------------------+\n\n\n");
-
     marcas(1);
 
     printf("\n\t\t\t\t\t\t\t-------------- Ocorrências --------------\n");
@@ -1154,14 +1207,14 @@ void tela_consultar_ocorrencias() {
             ocorrencia.descricao, &ocorrencia.data_ocorrencia.dia, &ocorrencia.data_ocorrencia.mes,
             &ocorrencia.data_ocorrencia.ano, ocorrencia.acao, &ocorrencia.ativo) == 9) {
 
-            printf("\n\n\t\t\t\t\t\t\t\tID Ocorrência: %d\n\t\t\t\t\t\t\t\tProcesso: %d | Tutor: %d\n",
+            printf("\n\t-----------------------------------------\n");
+            printf("\n\n\tID Ocorrência: %d\n\tProcesso: %d | Tutor: %d\n",
                    ocorrencia.id_ocorrencia, ocorrencia.id_processo, ocorrencia.id_tutor);
-            printf("\t\t\t\t\t\t\t\tData: %02d/%02d/%04d\n",
+            printf("\tData: %02d/%02d/%04d\n",
                    ocorrencia.data_ocorrencia.dia, ocorrencia.data_ocorrencia.mes, ocorrencia.data_ocorrencia.ano);
-            printf("\t\t\t\t\t\t\t\tDescrição: %s\n", ocorrencia.descricao);
-            printf("\t\t\t\t\t\t\t\tAção: %s\n", ocorrencia.acao);
-            printf("\t\t\t\t\t\t\t\tStatus: %s\n", ocorrencia.ativo == 1 ? "Ativa" : "Inativa");
-            printf("\n\t\t\t\t\t\t\t-----------------------------------------\n");
+            printf("\tDescrição: %s\n", ocorrencia.descricao);
+            printf("\tAção: %s\n", ocorrencia.acao);
+            printf("\tStatus: %s\n", ocorrencia.ativo == 1 ? "Ativa" : "Inativa");
         }
     }
 
@@ -1179,7 +1232,7 @@ int controladores_inteiros(char* mensagem) {
         resultado = scanf("%d", &valor);
         fflush(stdin);
         if (resultado != 1) {
-            printf("\n\t\t\t\tErro: Digite um número inteiro válido.\n");
+            printf("\n\t\t\t\tErro: Digite um número inteiro válido.\n\n");
         }
     } while (resultado != 1);
     return valor;
@@ -1190,7 +1243,7 @@ int controladores_id(char* mensagem) {
     do {
         id = controladores_inteiros(mensagem);
         if (id <= 0) {
-            printf("\n\t\t\t\tErro: O ID deve ser um número positivo.\n");
+            printf("\n\t\t\t\tErro: O ID deve ser um número positivo.\n\n");
         }
     } while (id <= 0);
     return id;
@@ -1474,6 +1527,33 @@ int verificar_id_animal_existente(int id) {
         if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == id)
             return 1;
     }
+    return 0;
+}
+
+int animal_pertence_ao_tutor(int id_animal, int id_tutor) {
+    // Verifica se o animal existe
+    Animal animal = cadastro_pesquisar_animal(id_animal);
+    if (animal.ocupado != 1) {
+        return 0;
+    }
+
+    // Verifica se o animal pertence ao tutor
+    if (animal.id_tutor != id_tutor) {
+        return 0;
+    }
+
+    // Verifica se o tutor tem esse animal na sua lista
+    Tutor tutor = cadastro_pesquisar_tutor(id_tutor);
+    if (tutor.tutor_ocupado != 1) {
+        return 0;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        if (tutor.id_animais[i] == id_animal) {
+            return 1;
+        }
+    }
+
     return 0;
 }
 
