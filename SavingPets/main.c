@@ -79,9 +79,9 @@ int total_tutores = 0;
 char caminho_arquivo_animais[256] = "animais.txt";
 char caminho_arquivo_tutores[256] = "tutores.txt";
 
-// Funções
+// Protótipos de funções
 void cadastro_inicializar_animais();
-void cadastro_inicializar_tutores();
+void cadastro_initializar_tutores();
 void cadastro_inicializar_arquivo_animais();
 void cadastro_inicializar_arquivo_tutores();
 void cadastro_carregar_dados_arquivo_animais();
@@ -109,10 +109,15 @@ int tela_limite_animais(int id_tutor);
 int tela_exclusao_tutor_opcoes();
 int gerar_proximo_id_animal();
 int gerar_proximo_id_tutor();
-int animal_pertence_ao_tutor(int id_animal, int id_tutor); // Nova função de validação
+int animal_pertence_ao_tutor(int id_animal, int id_tutor);
 
-// Telas
-void marcas(int tela);
+// Protótipos das funções de tela
+char tela_ler_sexo(const char *mensagem);
+void tela_ler_cpf(int cpf[11]);
+void tela_ler_cep(int cep[8]);
+void tela_ler_telefone(int telefone[11]);
+void tela_centralizar_pausa();
+void tela_marcas(int tela);
 int tela_menu_opcoes();
 int tela_menu_processos_adotivos();
 int tela_novo_tutor_cadatro_animal(int id_tutor);
@@ -151,7 +156,8 @@ int main() {
     cadastro_inicializar_arquivo_animais();
     cadastro_carregar_dados_arquivo_tutores();
     cadastro_carregar_dados_arquivo_animais();
-    marcas(0);
+    tela_marcas(0);
+    tela_centralizar_pausa();
 
     do {
         opcao = tela_menu_opcoes();
@@ -184,8 +190,8 @@ int main() {
                 sair = tela_sair();
                 break;
             default:
-                printf("\t\t\t\tOpção Inválida !!! \n");
-                system("pause");
+                printf("\n\n\t\t\t\tOpção Inválida !!! \n\n");
+                tela_centralizar_pausa();
         }
     } while(sair == 0);
 
@@ -201,46 +207,45 @@ int main() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////// TELAS //////////////////////////////////////////
 
-void marcas(int tela) {
+void tela_marcas(int tela) {
     if(tela == 0){
         printf("Bem vindo ao:                                                                          \n");
-        printf("\t\t\t\t                                                                          \n");
-        printf("\t\t\t\t                         @@@@@@@@@             @@@@@@@@@@                  \n");
-        printf("\t\t\t\t                       @@@@@@@@@@@@@         @@@@@@@@@@@@@                 \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@                \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@              \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@              \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@                \n");
-        printf("\t\t\t\t                       @@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@                \n");
-        printf("\t\t\t\t                        @@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@    @@@@@@@     \n");
-        printf("\t\t\t\t            @@@@@@@@@     @@@@@@@@@@@@      @@@@@@@@@@@@   @@@@@@@@@@@@   \n");
-        printf("\t\t\t\t          @@@@@@@@@@@@@     @@@@@@@@          @@@@@@@@    @@@@@@@@@@@@@@  \n");
-        printf("\t\t\t\t          @@@@@@@@@@@@@@@                               @@@@@@@@@@@@@@@@  \n");
-        printf("\t\t\t\t          @@@@@@@@@@@@@@@@                              @@@@@@@@@@@@@@@@  \n");
-        printf("\t\t\t\t          @@@@@@@@@@@@@@@@@                            @@@@@@@@@@@@@@@@@  \n");
-        printf("\t\t\t\t          @@@@@@@@@@@@@@@@@           @@@@@@@          @@@@@@@@@@@@@@@@@  \n");
-        printf("\t\t\t\t           @@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@   \n");
-        printf("\t\t\t\t            @@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@     \n");
-        printf("\t\t\t\t             @@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@       \n");
-        printf("\t\t\t\t                 @@@@@@   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  \n");
-        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 \n");
-        printf("\t\t\t\t                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                \n");
-        printf("\t\t\t\t                       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             \n");
-        printf("\t\t\t\t                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
-        printf("\t\t\t\t                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
-        printf("\t\t\t\t                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           \n");
-        printf("\t\t\t\t                      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
-        printf("\t\t\t\t                       @@@@@@@@@@@@               @@@@@@@@@@@@             \n");
+        printf("\t\t\t\t                                                                             \n");
+        printf("\t\t\t\t                            @@@@@@@@@             @@@@@@@@@@                  \n");
+        printf("\t\t\t\t                          @@@@@@@@@@@@@         @@@@@@@@@@@@@                 \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@                \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@              \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@              \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@                \n");
+        printf("\t\t\t\t                          @@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@                \n");
+        printf("\t\t\t\t                           @@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@    @@@@@@@     \n");
+        printf("\t\t\t\t               @@@@@@@@@     @@@@@@@@@@@@      @@@@@@@@@@@@   @@@@@@@@@@@@   \n");
+        printf("\t\t\t\t             @@@@@@@@@@@@@     @@@@@@@@          @@@@@@@@    @@@@@@@@@@@@@@  \n");
+        printf("\t\t\t\t             @@@@@@@@@@@@@@@                               @@@@@@@@@@@@@@@@  \n");
+        printf("\t\t\t\t             @@@@@@@@@@@@@@@@                              @@@@@@@@@@@@@@@@  \n");
+        printf("\t\t\t\t             @@@@@@@@@@@@@@@@@                            @@@@@@@@@@@@@@@@@  \n");
+        printf("\t\t\t\t             @@@@@@@@@@@@@@@@@           @@@@@@@          @@@@@@@@@@@@@@@@@  \n");
+        printf("\t\t\t\t              @@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@   \n");
+        printf("\t\t\t\t               @@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@     \n");
+        printf("\t\t\t\t                @@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@       \n");
+        printf("\t\t\t\t                    @@@@@@   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  \n");
+        printf("\t\t\t\t                            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 \n");
+        printf("\t\t\t\t                           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                \n");
+        printf("\t\t\t\t                          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             \n");
+        printf("\t\t\t\t                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
+        printf("\t\t\t\t                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
+        printf("\t\t\t\t                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           \n");
+        printf("\t\t\t\t                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            \n");
+        printf("\t\t\t\t                          @@@@@@@@@@@@               @@@@@@@@@@@@             \n");
         printf("\t\t\t\t                                                                           \n\n\n");
 
-        printf("\t\t\t\t    _______ _______ _    _ _____ __   _  ______  _____  _______ _______ _______\n");
-        printf("\t\t\t\t    |______ |_____|  \\  /    |   | \\  | |  ____ |_____] |______    |    |______\n");
-        printf("\t\t\t\t    ______| |     |   \\/   __|__ |  \\_| |_____| |       |______    |    ______|\n");
+        printf("\t\t\t\t       _______ _______ _    _ _____ __   _  ______  _____  _______ _______ _______\n");
+        printf("\t\t\t\t       |______ |_____|  \\  /    |   | \\  | |  ____ |_____] |______    |    |______\n");
+        printf("\t\t\t\t       ______| |     |   \\/   __|__ |  \\_| |_____| |       |______    |    ______|\n");
         printf("                                                                           \n");
 
         printf("\t\t\t\t\t       Sistema Gerenciador de Pós adoção de Animais Resgatados\n\n");
-        system("pause");
     } else if(tela == 1) {
         printf("\t\t\t\t\t\t\t                   /\\_/\\   \n");
         printf("\t\t\t\t\t\t\t                  ( o.o )  \n");
@@ -253,6 +258,113 @@ void marcas(int tela) {
         printf("\t\t\t\t\t\t\t                 |    \\\\\n");
         printf("\t\t\t\t\t\t\t                 || (__V \n\n");
     }
+}
+
+char tela_ler_sexo(const char *mensagem) {
+    char sexo;
+    do {
+        printf("%s (M/F): ", mensagem);
+        scanf(" %c", &sexo);
+        fflush(stdin);
+        sexo = toupper(sexo);
+        if (sexo != 'M' && sexo != 'F') {
+            printf("\n\n\t\t\t\tErro: Sexo inválido. Digite M ou F.\n\n");
+        }
+    } while (sexo != 'M' && sexo != 'F');
+    return sexo;
+}
+
+void tela_ler_cpf(int cpf[11]) {
+    char entrada[12];
+    int valido = 0;
+    do {
+        printf("\t\t\t\tCPF (11 dígitos): ");
+        if (scanf(" %11[^\n]", entrada) != 1) {
+            fflush(stdin);
+            continue;
+        }
+        fflush(stdin);
+        if (strlen(entrada) != 11) {
+            printf("\n\n\t\t\t\tErro: CPF deve ter exatamente 11 dígitos.\n\n");
+            continue;
+        }
+        valido = 1;
+        for (int i = 0; i < 11; i++) {
+            if (!isdigit(entrada[i])) {
+                printf("\n\n\t\t\t\tErro: CPF deve conter apenas números.\n\n");
+                valido = 0;
+                break;
+            }
+        }
+    } while (!valido);
+
+    for (int i = 0; i < 11; i++) {
+        cpf[i] = entrada[i] - '0';
+    }
+}
+
+void tela_ler_cep(int cep[8]) {
+    char entrada[9];
+    int valido = 0;
+    do {
+        printf("\t\t\t\tDigite o CEP (8 dígitos): ");
+        if (scanf(" %8[^\n]", entrada) != 1) {
+            fflush(stdin);
+            continue;
+        }
+        fflush(stdin);
+        if (strlen(entrada) != 8) {
+            printf("\n\n\t\t\t\tErro: CEP deve ter exatamente 8 dígitos.\n\n");
+            continue;
+        }
+        valido = 1;
+        for (int i = 0; i < 8; i++) {
+            if (!isdigit(entrada[i])) {
+                printf("\n\n\t\t\t\tErro: CEP deve conter apenas números.\n\n");
+                valido = 0;
+                break;
+            }
+        }
+    } while (!valido);
+
+    for (int i = 0; i < 8; i++) {
+        cep[i] = entrada[i] - '0';
+    }
+}
+
+void tela_ler_telefone(int telefone[11]) {
+    char entrada[12];
+    int valido = 0;
+    do {
+        printf("\t\t\t\tDigite o telefone com DDD (11 dígitos): ");
+        if (scanf(" %11[^\n]", entrada) != 1) {
+            fflush(stdin);
+            continue;
+        }
+        fflush(stdin);
+        if (strlen(entrada) != 11) {
+            printf("\n\n\t\t\t\tErro: Telefone deve ter exatamente 11 dígitos.\n\n");
+            continue;
+        }
+        valido = 1;
+        for (int i = 0; i < 11; i++) {
+            if (!isdigit(entrada[i])) {
+                printf("\n\n\t\t\t\tErro: Telefone deve conter apenas números.\n\n");
+                valido = 0;
+                break;
+            }
+        }
+    } while (!valido);
+
+    for (int i = 0; i < 11; i++) {
+        telefone[i] = entrada[i] - '0';
+    }
+}
+
+void tela_centralizar_pausa() {
+    printf("\n\t\t\t\t\t\t\t     Pressione Enter para continuar...");
+    fflush(stdin);
+    getchar();
 }
 
 int tela_menu_opcoes() {
@@ -325,16 +437,16 @@ void tela_processos_adotivos() {
                 sair = 1;
                 break;
             default:
-                printf("\n\t\t\t\t\t\t           Opção Inválida! \n\n");
-                system("pause");
+                printf("\n\n\t\t\t\t\t\t           Opção Inválida! \n\n");
+                tela_centralizar_pausa();
         }
     } while(sair == 0);
 }
 
 int tela_novo_tutor_cadatro_animal(int id_tutor) {
     if (cadastro_verificar_capacidade_maxima_tutores() == 1) {
-        printf("\n\t\t\t\tErro: Capacidade máxima de tutores atingida!\n");
-        system("pause");
+        printf("\n\n\t\t\t\tErro: Capacidade máxima de tutores atingida!\n\n");
+        tela_centralizar_pausa();
         return 0;
     }
 
@@ -348,15 +460,9 @@ int tela_novo_tutor_cadatro_animal(int id_tutor) {
     scanf(" %255[^\n]", t.nome_tutor);
     fflush(stdin);
 
-    printf("\t\t\t\tSexo (M/F): ");
-    scanf(" %c", &t.sexo);
-    fflush(stdin);
+    t.sexo = tela_ler_sexo("\t\t\t\tSexo");
 
-    printf("\t\t\t\tCPF (11 dígitos): ");
-    for(int j = 0; j < 11; j++) {
-        scanf("%1d", &t.cpf[j]);
-    }
-    fflush(stdin);
+    tela_ler_cpf(t.cpf);
 
     t.endereco = tela_cadastar_endereco();
     t.contato = tela_cadastrar_forma_contato();
@@ -365,7 +471,7 @@ int tela_novo_tutor_cadatro_animal(int id_tutor) {
     cadastro_inserir_tutor(t);
 
     printf("\t\t\t\tTutor cadastrado com sucesso!\n");
-    system("pause");
+    tela_centralizar_pausa();
 
     system("cls");
     return 1;
@@ -379,8 +485,8 @@ int tela_novo_animal_cadatro_tutor(int id_animal, int id_tutor) {
     printf("\t\t\t\t\t\t\t     --- Cadastro de Novo Animal ---\n");
 
     if (cadastro_verificar_capacidade_maxima_animais() == 1) {
-        printf("\t\t\t\tErro: Capacidade máxima de animais atingida!\n");
-        system("pause");
+        printf("\n\n\t\t\t\tErro: Capacidade máxima de animais atingida!\n\n");
+        tela_centralizar_pausa();
         return 0;
     }
 
@@ -395,9 +501,7 @@ int tela_novo_animal_cadatro_tutor(int id_animal, int id_tutor) {
     scanf(" %255[^\n]", a.especie);
     fflush(stdin);
 
-    printf("\t\t\t\tSexo (M/F): ");
-    scanf(" %c", &a.sexo);
-    fflush(stdin);
+    a.sexo = tela_ler_sexo("\t\t\t\tSexo");
 
     printf("\t\t\t\tRaça: ");
     scanf(" %255[^\n]", a.raca);
@@ -420,128 +524,19 @@ int tela_novo_animal_cadatro_tutor(int id_animal, int id_tutor) {
     fflush(stdin);
 
     a.ocupado = 1;
-    a.adotado = 1; // Animal já é adotado pelo tutor
+    a.adotado = 1;
     cadastro_inserir_animal(a);
 
     printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n\n");
-    system("pause");
+    tela_centralizar_pausa();
     system("cls");
     return 1;
-}
-
-void tela_cadastrar_animal() {
-    int continuar;
-    Animal a = {0}; // Inicializa todos os campos com zero
-    int opcao;
-
-    do {
-        system("cls");
-        printf("\t\t\t\t\t\t\t     --- Cadastro de Animal ---\n");
-
-        if (cadastro_verificar_capacidade_maxima_animais() == 1) {
-            printf("\n\t\t\t\tErro: Capacidade máxima de animais atingida!\n");
-            system("pause");
-            return;
-        }
-
-        // Gera ID automático
-        a.id_animal = gerar_proximo_id_animal();
-        printf("\n\t\t\t\tID do animal: %d\n\n", a.id_animal);
-
-        if (verificar_id_animal_existente(a.id_animal)) {
-            printf("\n\t\t\t\tErro: ID de animal já cadastrado!\n");
-            system("pause");
-            continue;
-        }
-
-        a.id_tutor = controladores_id("\t\t\t\tDigite o ID do tutor: ");
-
-        if (!verificar_id_tutor_existente(a.id_tutor)) {
-            printf("\t\t\t\tTutor não encontrado.\n\n");
-            printf("\t\t\t\t1 - Cadastrar novo tutor\n");
-            printf("\t\t\t\t2 - Cancelar\n");
-            opcao = controladores_inteiros("\n\t\t\t\tEscolha: ");
-
-            if (opcao == 1) {
-                if (tela_novo_tutor_cadatro_animal(a.id_tutor)) {
-                    // Continua após cadastrar o tutor
-                } else {
-                    continue;
-                }
-            } else {
-                continue;
-            }
-        }
-
-        // VERIFICA SE TUTOR TEM ESPAÇO PARA MAIS ANIMAIS
-        Tutor tutor = cadastro_pesquisar_tutor(a.id_tutor);
-        int count = 0;
-        for (int j = 0; j < 10; j++) {
-            if (tutor.id_animais[j] != 0) {
-                count++;
-            }
-        }
-
-        if (count >= 10) {
-            int result = tela_limite_animais(a.id_tutor);
-            if (result == 0) {
-                printf("\n\t\t\t\tOperação cancelada. O tutor não tem espaço.\n");
-                system("pause");
-                continue;
-            }
-        }
-
-        printf("\t\t\t\tNome do animal: ");
-        scanf(" %255[^\n]", a.nome_animal);
-        fflush(stdin);
-
-        printf("\t\t\t\tEspécie: ");
-        scanf(" %255[^\n]", a.especie);
-        fflush(stdin);
-
-        printf("\t\t\t\tSexo (M/F): ");
-        scanf(" %c", &a.sexo);
-        fflush(stdin);
-
-        printf("\t\t\t\tRaça: ");
-        scanf(" %255[^\n]", a.raca);
-        fflush(stdin);
-
-        printf("\t\t\t\tVacinas: ");
-        scanf(" %511[^\n]", a.vacinas);
-        fflush(stdin);
-
-        printf("\t\t\t\tVermifugado (S/N): ");
-        scanf(" %c", &a.vermifugado);
-        fflush(stdin);
-
-        printf("\t\t\t\tHistórico de saúde: ");
-        scanf(" %511[^\n]", a.historico);
-        fflush(stdin);
-
-        printf("\t\t\t\tCastrado (S/N): ");
-        scanf(" %c", &a.castrado);
-        fflush(stdin);
-
-        a.ocupado = 1;
-        a.adotado = 0; // Será marcado como adotado na função inserir_id_animal_em_tutor
-        cadastro_inserir_animal(a);
-        inserir_id_animal_em_tutor(a.id_animal, a.id_tutor);
-
-        printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n\n");
-
-        continuar = tela_mensagem("\n\n\t\t\t\tDeseja cadastrar outro animal?");
-    } while (continuar == 1);
 }
 
 Endereco tela_cadastar_endereco() {
     Endereco endereco;
 
-    printf("\t\t\t\tDigite o CEP: ");
-    for(int j = 0; j < 8; j++) {
-        scanf("%1d", &endereco.cep[j]);
-    }
-    fflush(stdin);
+    tela_ler_cep(endereco.cep);
 
     printf("\t\t\t\tInforme a rua: ");
     scanf(" %119[^\n]", endereco.rua);
@@ -569,11 +564,7 @@ Endereco tela_cadastar_endereco() {
 Forma_contato tela_cadastrar_forma_contato() {
     Forma_contato contato;
 
-    printf("\t\t\t\tDigite o telefone com ddd: ");
-    for(int j = 0; j < 11; j++) {
-        scanf("%1d", &contato.telefone[j]);
-    }
-    fflush(stdin);
+    tela_ler_telefone(contato.telefone);
 
     printf("\t\t\t\tDigite o e-mail: ");
     scanf(" %119[^\n]", contato.email);
@@ -582,9 +573,109 @@ Forma_contato tela_cadastrar_forma_contato() {
     return contato;
 }
 
+void tela_cadastrar_animal() {
+    int continuar;
+    Animal a = {0};
+    int opcao;
+
+    do {
+        system("cls");
+        printf("\t\t\t\t\t\t\t     --- Cadastro de Animal ---\n");
+
+        if (cadastro_verificar_capacidade_maxima_animais() == 1) {
+            printf("\n\n\t\t\t\tErro: Capacidade máxima de animais atingida!\n\n");
+            tela_centralizar_pausa();
+            return;
+        }
+
+        a.id_animal = gerar_proximo_id_animal();
+        printf("\n\t\t\t\tID do animal: %d\n\n", a.id_animal);
+
+        if (verificar_id_animal_existente(a.id_animal)) {
+            printf("\n\n\t\t\t\tErro: ID de animal já cadastrado!\n\n");
+            tela_centralizar_pausa();
+            continue;
+        }
+
+        a.id_tutor = controladores_id("\t\t\t\tDigite o ID do tutor: ");
+
+        if (!verificar_id_tutor_existente(a.id_tutor)) {
+            printf("\t\t\t\tTutor não encontrado.\n\n");
+            printf("\t\t\t\t1 - Cadastrar novo tutor\n");
+            printf("\t\t\t\t2 - Cancelar\n");
+            opcao = controladores_inteiros("\n\t\t\t\tEscolha: ");
+
+            if (opcao == 1) {
+                if (tela_novo_tutor_cadatro_animal(a.id_tutor)) {
+                    // Continua após cadastrar o tutor
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+        }
+
+        Tutor tutor = cadastro_pesquisar_tutor(a.id_tutor);
+        int count = 0;
+        for (int j = 0; j < 10; j++) {
+            if (tutor.id_animais[j] != 0) {
+                count++;
+            }
+        }
+
+        if (count >= 10) {
+            int result = tela_limite_animais(a.id_tutor);
+            if (result == 0) {
+                printf("\n\n\t\t\t\tOperação cancelada. O tutor não tem espaço.\n\n");
+                tela_centralizar_pausa();
+                continue;
+            }
+        }
+
+        printf("\t\t\t\tNome do animal: ");
+        scanf(" %255[^\n]", a.nome_animal);
+        fflush(stdin);
+
+        printf("\t\t\t\tEspécie: ");
+        scanf(" %255[^\n]", a.especie);
+        fflush(stdin);
+
+        a.sexo = tela_ler_sexo("\t\t\t\tSexo");
+
+        printf("\t\t\t\tRaça: ");
+        scanf(" %255[^\n]", a.raca);
+        fflush(stdin);
+
+        printf("\t\t\t\tVacinas: ");
+        scanf(" %511[^\n]", a.vacinas);
+        fflush(stdin);
+
+        printf("\t\t\t\tVermifugado (S/N): ");
+        scanf(" %c", &a.vermifugado);
+        fflush(stdin);
+
+        printf("\t\t\t\tHistórico de saúde: ");
+        scanf(" %511[^\n]", a.historico);
+        fflush(stdin);
+
+        printf("\t\t\t\tCastrado (S/N): ");
+        scanf(" %c", &a.castrado);
+        fflush(stdin);
+
+        a.ocupado = 1;
+        a.adotado = 0;
+        cadastro_inserir_animal(a);
+        inserir_id_animal_em_tutor(a.id_animal, a.id_tutor);
+
+        printf("\n\t\t\t\tAnimal cadastrado com sucesso!\n");
+
+        continuar = tela_mensagem("\n\n\t\t\t\tDeseja cadastrar outro animal?");
+    } while (continuar == 1);
+}
+
 void tela_cadastrar_tutor() {
     int quantidade_adotados;
-    char cadastrar_novo_animal;
     int continuar;
 
     Tutor t;
@@ -595,27 +686,21 @@ void tela_cadastrar_tutor() {
         printf("\t\t\t\t\t\t\t     --- Cadastro de Tutor ---\n\n");
 
         if (cadastro_verificar_capacidade_maxima_tutores() == 1) {
-            printf("\n\t\t\t\tErro: Capacidade máxima de tutores atingida!\n");
-
-            system("pause");
+            printf("\n\n\t\t\t\tErro: Capacidade máxima de tutores atingida!\n\n");
+            tela_centralizar_pausa();
             system("cls");
-
             break;
         }
 
-        // Gera ID automático
         t.id_tutor = gerar_proximo_id_tutor();
-
         printf("\t\t\t\tID do tutor: %d\n\n", t.id_tutor);
 
         quantidade_adotados = controladores_inteiros("\t\t\t\tDigite a quantidade de animais adotados: ");
 
         if (quantidade_adotados < 1 || quantidade_adotados > 10) {
-            printf("\n\t\t\t\tNão é possível cadastrar tutores com menos de 1 animal ou mais de 10 animais\n");
-
-            system("pause");
+            printf("\n\n\t\t\t\tNão é possível cadastrar tutores com menos de 1 animal ou mais de 10 animais\n\n");
+            tela_centralizar_pausa();
             system("cls");
-
             continue;
         }
 
@@ -628,12 +713,10 @@ void tela_cadastrar_tutor() {
                 if (verificar_id_animal_existente(id_animal)) {
                     Animal animal = cadastro_pesquisar_animal(id_animal);
                     if (animal.adotado == 1) {
-                        printf("\n\t\t\t\tErro: O animal de ID %d já está adotado por outro tutor.\n", id_animal);
+                        printf("\n\n\t\t\t\tErro: O animal de ID %d já está adotado por outro tutor.\n", id_animal);
                         printf("\t\t\t\tPor favor, escolha outro animal.\n\n");
-
-                        system("pause");
+                        tela_centralizar_pausa();
                         system("cls");
-
                     } else {
                         t.id_animais[i] = id_animal;
                         id_valido = 1;
@@ -661,15 +744,9 @@ void tela_cadastrar_tutor() {
         scanf(" %255[^\n]", t.nome_tutor);
         fflush(stdin);
 
-        printf("\t\t\t\tSexo (M/F): ");
-        scanf(" %c", &t.sexo);
-        fflush(stdin);
+        t.sexo = tela_ler_sexo("\t\t\t\tSexo");
 
-        printf("\t\t\t\tCPF (11 dígitos): ");
-        for(int j = 0; j < 11; j++) {
-            scanf("%1d", &t.cpf[j]);
-        }
-        fflush(stdin);
+        tela_ler_cpf(t.cpf);
 
         t.endereco = tela_cadastar_endereco();
         t.contato = tela_cadastrar_forma_contato();
@@ -677,7 +754,6 @@ void tela_cadastrar_tutor() {
         t.tutor_ocupado = 1;
         cadastro_inserir_tutor(t);
 
-        // ATUALIZA OS ANIMAIS PARA ADOTADOS
         for (int i = 0; i < quantidade_adotados; i++) {
             if (t.id_animais[i] != 0) {
                 for (int j = 0; j < NUM_MAX_ANIMAIS; j++) {
@@ -691,10 +767,8 @@ void tela_cadastrar_tutor() {
         }
 
         printf("\n\t\t\t\tTutor cadastrado com sucesso!\n\n");
-
-        system("pause");
+        tela_centralizar_pausa();
         system("cls");
-
         continuar = tela_mensagem("\n\t\t\t\tDeseja cadastrar outro tutor?");
     } while (continuar == 1);
 }
@@ -726,11 +800,9 @@ void tela_relatorio() {
             case 3:
                 return;
             default:
-                printf("\n\t\t\t\t\tOpção Inválida !!! \n");
-
-                system("pause");
+                printf("\n\n\t\t\t\t\tOpção Inválida !!! \n\n");
+                tela_centralizar_pausa();
                 system("cls");
-
         }
     } while(1);
 }
@@ -756,7 +828,7 @@ void tela_relatorio_animais() {
             printf("\t+-------------------------------------------------+\n\n");
         }
     }
-    system("pause");
+    tela_centralizar_pausa();
 }
 
 void tela_relatorio_tutores() {
@@ -807,7 +879,7 @@ void tela_relatorio_tutores() {
             printf("\t+-------------------------------------------------+\n\n");
         }
     }
-    system("pause");
+    tela_centralizar_pausa();
 }
 
 void tela_pesquisar() {
@@ -833,9 +905,9 @@ void tela_pesquisar() {
             printf("\t| Castrado: %c\n", a.castrado);
             printf("\t+-------------------------------------------------+\n\n");
         } else {
-            printf("\t\t\t\tAnimal não encontrado.\n\n");
+            printf("\n\n\t\t\t\tAnimal não encontrado.\n\n");
         }
-        system("pause");
+        tela_centralizar_pausa();
         continuar = tela_mensagem("\n\tDeseja pesquisar outro animal?");
     } while (continuar == 1);
 }
@@ -888,9 +960,9 @@ void tela_pesquisar_tutor() {
             printf("\t| Email: %s\n", t.contato.email);
             printf("\t+-------------------------------------------------+\n\n");
         } else {
-            printf("\n\tTutor não encontrado.\n\n");
+            printf("\n\n\t\t\t\tTutor não encontrado.\n\n");
         }
-        system("pause");
+        tela_centralizar_pausa();
         continuar = tela_mensagem("\n\tDeseja pesquisar outro tutor?");
     } while (continuar == 1);
 }
@@ -904,12 +976,12 @@ void tela_remover() {
         id = controladores_id("\t\t\t\tDigite o ID do animal a ser removido: ");
 
         if (cadastro_remover_animal(id)) {
-            printf("\t\t\t\tAnimal removido com sucesso.\n\n");
+            printf("\n\n\t\t\t\tAnimal removido com sucesso.\n\n");
         } else {
-            printf("\n\t\t\t\tAnimal não encontrado.\n\n");
+            printf("\n\n\t\t\t\tAnimal não encontrado.\n\n");
         }
 
-        system("pause");
+        tela_centralizar_pausa();
         continuar = tela_mensagem("\n\t\t\t\tDeseja remover outro animal?");
     } while (continuar == 1);
 }
@@ -922,19 +994,19 @@ void tela_remover_tutor() {
         id = controladores_id("\t\t\t\tDigite o ID do tutor a ser removido: ");
 
         if (cadastro_remover_tutor(id)) {
-            printf("\n\t\t\t\tTutor removido com sucesso.\n\n");
+            printf("\n\n\t\t\t\tTutor removido com sucesso.\n\n");
         } else {
-            printf("\n\t\t\t\tTutor não encontrado ou operação cancelada.\n\n");
+            printf("\n\n\t\t\t\tTutor não encontrado ou operação cancelada.\n\n");
         }
 
-        system("pause");
+        tela_centralizar_pausa();
         continuar = tela_mensagem("\n\t\t\t\tDeseja remover outro tutor?");
     } while (continuar == 1);
 }
 
 int tela_sair() {
     system("cls");
-    return tela_mensagem("\n\t\t\t\tDeseja realmente sair?");
+    return tela_mensagem("\n\n\t\t\t\tDeseja realmente sair?");
 }
 
 int tela_mensagem(char *mensagem) {
@@ -948,14 +1020,14 @@ int tela_mensagem(char *mensagem) {
         if (resp == 'S') return 1;
         if (resp == 'N') return 0;
 
-        printf("\t\t\t\tErro: Digite apenas 's' ou 'n'!\n");
+        printf("\n\n\t\t\t\tErro: Digite apenas 's' ou 'n'!\n\n");
     } while (1);
 }
 
 void tela_cadastrar_processo_adotivo() {
     FILE *file = fopen("processos.txt", "a");
     if (file == NULL) {
-        printf("\n\t\t\t\tErro ao abrir arquivo de processos.\n");
+        printf("\n\n\t\t\t\tErro ao abrir arquivo de processos.\n\n");
         return;
     }
 
@@ -964,13 +1036,12 @@ void tela_cadastrar_processo_adotivo() {
 
     system("cls");
 
-    marcas(1);
+    tela_marcas(1);
     printf("\t\t\t\t\t\t\t     --- Cadastro de Processo Adotivo ---\n\n");
 
     processo.id_processo = gerar_id_proximo("processos.txt", 0);
     printf("\t\t\t\tID do Processo gerado: %d\n\n", processo.id_processo);
 
-    // Validação Animal
     int animal_valido = 0;
     while (!animal_valido) {
         processo.id_animal = controladores_id("\t\t\t\tDigite o ID do Animal: ");
@@ -978,14 +1049,13 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_animal_existente(processo.id_animal)) {
             animal_valido = 1;
         } else {
-            printf("\n\t\t\t\tAnimal não encontrado! Cadastre o animal primeiro.\n\n");
-            system("pause");
+            printf("\n\n\t\t\t\tAnimal não encontrado! Cadastre o animal primeiro.\n\n");
+            tela_centralizar_pausa();
             fclose(file);
             return;
         }
     }
 
-    // Validação Tutor
     int tutor_valido = 0;
     while (!tutor_valido) {
         processo.id_tutor = controladores_id("\n\t\t\t\tDigite o ID do Tutor: ");
@@ -993,17 +1063,16 @@ void tela_cadastrar_processo_adotivo() {
         if (verificar_id_tutor_existente(processo.id_tutor)) {
             tutor_valido = 1;
         } else {
-            printf("\n\t\t\t\tTutor não encontrado! Cadastre o tutor primeiro.\n\n");
-            system("pause");
+            printf("\n\n\t\t\t\tTutor não encontrado! Cadastre o tutor primeiro.\n\n");
+            tela_centralizar_pausa();
             fclose(file);
             return;
         }
     }
 
-    // VALIDAÇÃO CRÍTICA: Verificar se o animal pertence ao tutor
     if (!animal_pertence_ao_tutor(processo.id_animal, processo.id_tutor)) {
-        printf("\n\t\t\t\tErro: Este animal não pertence ao tutor informado!\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tErro: Este animal não pertence ao tutor informado!\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
@@ -1033,14 +1102,14 @@ void tela_cadastrar_processo_adotivo() {
 
     fclose(file);
     printf("\n\t\t\t\tProcesso adotivo cadastrado com sucesso!\n");
-    system("pause");
+    tela_centralizar_pausa();
 }
 
 void tela_consultar_processos_adotivos() {
     FILE *file = fopen("processos.txt", "r");
     if (file == NULL) {
-        printf("\n\t\t\t\tErro ao abrir arquivo de processos.\n");
-        system("pause");
+        printf("\n\n\t\t\t\tErro ao abrir arquivo de processos.\n\n");
+        tela_centralizar_pausa();
         return;
     }
 
@@ -1049,7 +1118,7 @@ void tela_consultar_processos_adotivos() {
     char data[15];
 
     system("cls");
-    marcas(1);
+    tela_marcas(1);
     printf("\n\t\t\t\t\t\t\t     --- Processos Adotivos ---\n\n");
 
     while (fgets(linha, sizeof(linha), file) != NULL) {
@@ -1069,18 +1138,18 @@ void tela_consultar_processos_adotivos() {
             printf("\t\t\t\tStatus: %s\n", (processo.ativo == 1 ? "Ativo" : "Inativo"));
             printf("\t\t\t\t----------------------------------------\n\n");
         } else {
-            printf("\n\t\t\t\t[Erro] Linha mal formatada: %s", linha);
+            printf("\n\n\t\t\t\t[Erro] Linha mal formatada: %s", linha);
         }
     }
 
     fclose(file);
-    system("pause");
+    tela_centralizar_pausa();
 }
 
 void tela_cadastrar_ocorrencia() {
     FILE *file = fopen("ocorrencias.txt", "a");
     if (file == NULL) {
-        printf("\n\t\t\t\tErro ao abrir o arquivo de ocorrências.\n");
+        printf("\n\n\t\t\t\tErro ao abrir o arquivo de ocorrências.\n\n");
         return;
     }
 
@@ -1089,7 +1158,7 @@ void tela_cadastrar_ocorrencia() {
     system("cls");
 
     printf("\t\t\t\t\t\t\t       --- Cadastro de Ocorrencia ---\n\n\n");
-    marcas(1);
+    tela_marcas(1);
 
     ocorrencia.id_ocorrencia = gerar_id_proximo("ocorrencias.txt", 0);
     printf("\n\t\t\t\tID da Ocorrência gerado: %d\n\n", ocorrencia.id_ocorrencia);
@@ -1097,17 +1166,15 @@ void tela_cadastrar_ocorrencia() {
     ocorrencia.id_processo = controladores_id("\t\t\t\tDigite o ID do Processo Adotivo: ");
     ocorrencia.id_tutor = controladores_id("\t\t\t\tDigite o ID do Tutor: ");
 
-    // Validação do tutor
     if (!verificar_id_tutor_existente(ocorrencia.id_tutor)) {
-        printf("\n\t\t\t\tERRO! Não foi encontrado o tutor com este ID. Cadastre o tutor primeiro.\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tERRO! Não foi encontrado o tutor com este ID. Cadastre o tutor primeiro.\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
 
-    // Validação do animal via processo
     int processo_valido = 0;
-    int id_tutor_processo = -1;  // Para armazenar o tutor correto do processo
+    int id_tutor_processo = -1;
     int id_animal = -1;
 
     FILE *fp = fopen("processos.txt", "r");
@@ -1121,7 +1188,7 @@ void tela_cadastrar_ocorrencia() {
                 if (id_processo == ocorrencia.id_processo) {
                     processo_valido = 1;
                     id_animal = id_animal_temp;
-                    id_tutor_processo = id_tutor_temp;  // Guarda o tutor do processo
+                    id_tutor_processo = id_tutor_temp;
                     break;
                 }
             }
@@ -1130,32 +1197,29 @@ void tela_cadastrar_ocorrencia() {
     }
 
     if (!processo_valido) {
-        printf("\n\t\t\t\tERRO! Processo adotivo não encontrado.\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tERRO! Processo adotivo não encontrado.\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
 
-    // VALIDAÇÃO CRÍTICA: Verificar se o tutor da ocorrência é o mesmo do processo
     if (ocorrencia.id_tutor != id_tutor_processo) {
-        printf("\n\t\t\t\tERRO! O tutor informado não é o tutor deste processo adotivo.\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tERRO! O tutor informado não é o tutor deste processo adotivo.\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
 
-    // Validação do animal
     if (!verificar_id_animal_existente(id_animal)) {
-        printf("\n\t\t\t\tERRO! Animal associado ao processo não encontrado. Cadastre o animal primeiro.\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tERRO! Animal associado ao processo não encontrado. Cadastre o animal primeiro.\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
 
-    // VALIDAÇÃO FINAL: Verificar se o animal pertence ao tutor
     if (!animal_pertence_ao_tutor(id_animal, ocorrencia.id_tutor)) {
-        printf("\n\t\t\t\tERRO! Inconsistência: animal não pertence ao tutor!\n\n");
-        system("pause");
+        printf("\n\n\t\t\t\tERRO! Inconsistência: animal não pertence ao tutor!\n\n");
+        tela_centralizar_pausa();
         fclose(file);
         return;
     }
@@ -1181,16 +1245,15 @@ void tela_cadastrar_ocorrencia() {
 
     fclose(file);
     printf("\n\t\t\t\tOcorrência registrada com sucesso!\n");
-
-    system("pause");
+    tela_centralizar_pausa();
     system("cls");
 }
 
 void tela_consultar_ocorrencias() {
     FILE *file = fopen("ocorrencias.txt", "r");
     if (file == NULL) {
-        printf("\n\t\t\t\tErro ao abrir o arquivo de ocorrências.\n");
-        system("pause");
+        printf("\n\n\t\t\t\tErro ao abrir o arquivo de ocorrências.\n\n");
+        tela_centralizar_pausa();
         return;
     }
 
@@ -1199,7 +1262,7 @@ void tela_consultar_ocorrencias() {
 
     system("cls");
     printf("\t\t\t\t     +-------------------------- 4 - Consultar Ocorrência ---------------------------+\n\n\n");
-    marcas(1);
+    tela_marcas(1);
 
     printf("\n\t\t\t\t\t\t\t-------------- Ocorrências --------------\n");
 
@@ -1221,7 +1284,7 @@ void tela_consultar_ocorrencias() {
     }
 
     fclose(file);
-    system("pause");
+    tela_centralizar_pausa();
 }
 
 //////////////////////// FUNÇÕES ///////////////////////////////////////////
@@ -1234,7 +1297,7 @@ int controladores_inteiros(char* mensagem) {
         resultado = scanf("%d", &valor);
         fflush(stdin);
         if (resultado != 1) {
-            printf("\n\t\t\t\tErro: Digite um número inteiro válido.\n\n");
+            printf("\n\n\t\t\t\tErro: Digite um número inteiro válido.\n\n");
         }
     } while (resultado != 1);
     return valor;
@@ -1245,7 +1308,7 @@ int controladores_id(char* mensagem) {
     do {
         id = controladores_inteiros(mensagem);
         if (id <= 0) {
-            printf("\n\t\t\t\tErro: O ID deve ser um número positivo.\n\n");
+            printf("\n\n\t\t\t\tErro: O ID deve ser um número positivo.\n\n");
         }
     } while (id <= 0);
     return id;
@@ -1533,18 +1596,15 @@ int verificar_id_animal_existente(int id) {
 }
 
 int animal_pertence_ao_tutor(int id_animal, int id_tutor) {
-    // Verifica se o animal existe
     Animal animal = cadastro_pesquisar_animal(id_animal);
     if (animal.ocupado != 1) {
         return 0;
     }
 
-    // Verifica se o animal pertence ao tutor
     if (animal.id_tutor != id_tutor) {
         return 0;
     }
 
-    // Verifica se o tutor tem esse animal na sua lista
     Tutor tutor = cadastro_pesquisar_tutor(id_tutor);
     if (tutor.tutor_ocupado != 1) {
         return 0;
@@ -1585,8 +1645,8 @@ int verificar_id_tutor_existente2(int id_tutor) {
 int cadastro_inserir_tutor(Tutor tutor) {
     for (int i = 0; i < NUM_MAX_TUTORES; i++) {
         if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor == tutor.id_tutor) {
-            printf("\n\t\t\t\tErro: Já existe um tutor com este ID.\n");
-            system("pause");
+            printf("\n\n\t\t\t\tErro: Já existe um tutor com este ID.\n\n");
+            tela_centralizar_pausa();
             return 0;
         }
     }
@@ -1600,16 +1660,16 @@ int cadastro_inserir_tutor(Tutor tutor) {
         }
     }
 
-    printf("\n\t\t\t\tErro: Capacidade máxima de tutores atingida.\n");
-    system("pause");
+    printf("\n\n\t\t\t\tErro: Capacidade máxima de tutores atingida.\n\n");
+    tela_centralizar_pausa();
     return 0;
 }
 
 void cadastro_inserir_animal(Animal a) {
     for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
         if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == a.id_animal) {
-            printf("\n\t\t\t\tErro: Já existe um animal com este ID.\n");
-            system("pause");
+            printf("\n\n\t\t\t\tErro: Já existe um animal com este ID.\n\n");
+            tela_centralizar_pausa();
             return;
         }
     }
@@ -1647,7 +1707,7 @@ Animal cadastro_pesquisar_animal(int id) {
 
 int tela_limite_animais(int id_tutor) {
     system("cls");
-    printf("\n\t\t\t\tERRO! O tutor em questão atingiu o limite de animais alocados.\n\n");
+    printf("\n\n\t\t\t\tERRO! O tutor em questão atingiu o limite de animais alocados.\n\n");
     printf("\t\t\t\tSelecione como proceder:\n\n");
     printf("\t\t\t\t1 - Deletar um animal do tutor vigente.\n");
     printf("\t\t\t\t2 - Interromper cadastro.\n");
@@ -1660,8 +1720,8 @@ int tela_limite_animais(int id_tutor) {
     if (opcao == 1) {
         Tutor tutor = cadastro_pesquisar_tutor(id_tutor);
         if (tutor.tutor_ocupado == 0) {
-            printf("\n\t\t\t\tTutor não encontrado.\n");
-            system("pause");
+            printf("\n\n\t\t\t\tTutor não encontrado.\n\n");
+            tela_centralizar_pausa();
             return 0;
         }
 
@@ -1677,7 +1737,6 @@ int tela_limite_animais(int id_tutor) {
         scanf("%d", &id_animal_remover);
         fflush(stdin);
 
-        // Remove o animal do tutor
         for (int i = 0; i < NUM_MAX_TUTORES; i++) {
             if (vetor_tutores[i].tutor_ocupado == 1 && vetor_tutores[i].id_tutor == id_tutor) {
                 for (int j = 0; j < 10; j++) {
@@ -1690,7 +1749,6 @@ int tela_limite_animais(int id_tutor) {
             }
         }
 
-        // Atualiza o status do animal
         for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
             if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == id_animal_remover) {
                 vetor_animais[i].adotado = 0;
@@ -1725,7 +1783,6 @@ int cadastro_remover_tutor(int id) {
             int opcao = tela_exclusao_tutor_opcoes();
 
             if (opcao == 1) {
-                // Mantém os animais, apenas remove o tutor e desassocia os animais
                 for (int j = 0; j < 10; j++) {
                     int id_animal = vetor_tutores[i].id_animais[j];
                     if (id_animal != 0) {
@@ -1742,7 +1799,6 @@ int cadastro_remover_tutor(int id) {
                 total_tutores--;
                 return 1;
             } else if (opcao == 2) {
-                // Remove o tutor e todos os animais associados
                 for (int j = 0; j < 10; j++) {
                     int id_animal = vetor_tutores[i].id_animais[j];
                     if (id_animal != 0) {
@@ -1753,7 +1809,7 @@ int cadastro_remover_tutor(int id) {
                 total_tutores--;
                 return 1;
             } else {
-                return 0; // Operação cancelada
+                return 0;
             }
         }
     }
@@ -1761,7 +1817,6 @@ int cadastro_remover_tutor(int id) {
 }
 
 int cadastro_remover_animal(int id) {
-    // Encontra o tutor associado e remove o ID do animal
     for (int i = 0; i < NUM_MAX_TUTORES; i++) {
         if (vetor_tutores[i].tutor_ocupado == 1) {
             for (int j = 0; j < 10; j++) {
@@ -1773,7 +1828,6 @@ int cadastro_remover_animal(int id) {
         }
     }
 
-    // Remove o animal
     for (int i = 0; i < NUM_MAX_ANIMAIS; i++) {
         if (vetor_animais[i].ocupado == 1 && vetor_animais[i].id_animal == id) {
             vetor_animais[i].ocupado = 0;
@@ -1786,14 +1840,13 @@ int cadastro_remover_animal(int id) {
 
 int gerar_id_proximo(const char *nome_arquivo, int indice_id) {
     FILE *file = fopen(nome_arquivo, "r");
-    if (!file) return 1;  // Retorna 1 se o arquivo não existir (primeiro ID)
+    if (!file) return 1;
 
     int maior_id = 0;
     char linha[1024];
 
     while (fgets(linha, sizeof(linha), file) != NULL) {
         int id_atual;
-        // Tenta extrair o ID do início da linha
         if (sscanf(linha, "%d", &id_atual) == 1) {
             if (id_atual > maior_id) {
                 maior_id = id_atual;
